@@ -3,6 +3,8 @@ $("document").ready(function(){
 //variables to change and update game
 
 var gameName;
+var joinName
+var room;
 var playerOneName;
 var playerOneChoice;
 var playerOneWins;
@@ -12,8 +14,7 @@ var playerTwoChoice;
 var playerTwoWins;
 var playerTwoLosses;
 var playerTwoChat; 
-var playerOne=0;
-var playerTwo=0;
+var player = 0;
 
 //linking Firebase
 var firebaseConfig = {
@@ -35,6 +36,12 @@ var newGame = firebase.database().ref();
 
 database.ref().set({
     games:{}
+});
+
+$("#rps-btn").hide();
+
+database.ref().on("child_added", function(snapshot){
+    console.log(snapshot.val())
 });
 
 
@@ -78,12 +85,12 @@ function createGame(){
 $("body").on("click", "#create-game", function(){
     createGame();
     makeGame();
-    playerOne=1;
-    console.log(playerOne);
-    console.log(playerTwo);
+    player=1;
+    console.log(player);
+    $("#rps-btn").show();
+    $("#main-display").hide();
 
     //update html and load game data here
-
 
 });
 
@@ -91,19 +98,101 @@ $("body").on("click", "#create-game", function(){
 //function to join game
 $("body").on("click", "#join-game", function(){
     playerTwoName = prompt("Please enter your gamer name:", "Dumpster Juice");
-    gameName = prompt("Please enter game name:", "Sock'em Boppers");
+    joinName = prompt("Please enter game name:", "Sock'em Boppers");
+    player=2;
+    console.log(player);
+    var gameSearch = database.ref().child(joinName);
+    if(gameSearch === null || undefined){
+        alert("Game does not exist.");
+    }else{
 
-playerTwo=1;
-console.log(playerOne);
-console.log(playerTwo);
+    $("#rps-btn").show();
+    $("#main-display").hide();
+
+    
+};
+    
 
     //update html and load game data here. "if" no game is found do an alert.
     
 });
 
+//function rules to be ran in the game so it isn't typed twice
 
-//run game. if playerone/two == 1 then update info for that player data
+function rules(a,b){
 
+    if(a === b){
+        //it's a tie
+
+        //update html no points added,
+    }else if(a==="rock" && b==="paper" || a==="paper" && b==="scissors" || a==="scissors" && b==="rock" ){
+        //player a loses
+    }else{
+        //player wins
+    }
+
+
+};
+
+
+
+
+//function for the game itself
+/*function game(){
+
+  
+    if(player == 1){
+        if(playerTwoChoice == null){
+            //notify player one is ready
+        }else{
+            rules(playerOneChoice,playerTwoChoice);
+        }
+    };
+
+    if(player == 2){
+        if(playerOneChoice == null){
+            //notify player two is ready
+        }else{
+            rules();
+        }
+    }
+};*/
+
+//click event to run game
+
+$("body").on("click",".choice", function(){
+    
+    //var buttonId = $(".rps-btn").attr
+
+     if(player == 1){
+
+        //I need to get choice from button. Update that as plaayer onechoice
+        var choice = $(this).attr("value");
+        console.log(choice);
+        //var choiceTwo = database
+
+        //I then need to pull value from firbase and update variable p2choice
+        if(choiceTwo == null){
+            //notify player one is ready
+        }else{
+            rules(choice,choice2);
+        }
+    };
+
+    if(player == 2){
+        var choice = $(this).attr("value");
+        console.log(choice);
+
+        if(playerOneChoice == null){
+            //notify player two is ready
+
+
+        }else{
+            rules();
+        }
+    }
+
+})
 });
 
 
