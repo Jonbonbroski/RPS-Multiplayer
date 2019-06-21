@@ -57,22 +57,27 @@ function makeGame(){
             player2choice:playerTwoChoice,
             player2wins:playerOneWins,
             player2losses:playerOneLosses,
-            player2chat:playerOneChat,            
+            player2chat:playerOneChat,
+            playerReady: "",            
         }
      });
 };
+
+database.ref("games").on("value", function(changedSnapshot){
+    console.log(changedSnapshot.val());
+})
 
 //function to set var values and make player one.
 
 function createGame(){
         playerOneName = prompt("Please enter your gamer name:", "Dumpster Juice");
         gameName = prompt("Please enter game name:", "Sock'em Boppers");
-        playerOneChoice = null;
+        playerOneChoice = "none";
         playerOneWins = 0;
         playerOneLosses = 0;
         playerOneChat = 0;
         playerTwoName= null;
-        playerTwoChoice = null;
+        playerTwoChoice = "none";
         playerTwoWins = 0;
         playerTwoLosses = 0;
         playerTwoChat = 0;
@@ -102,7 +107,7 @@ $("body").on("click", "#join-game", function(){
     player=2;
     console.log(player);
     var gameSearch = database.ref().child(joinName);
-    if(gameSearch === null || undefined){
+    if(gameSearch === null || undefined){        
         alert("Game does not exist.");
     }else{
 
@@ -112,10 +117,10 @@ $("body").on("click", "#join-game", function(){
     
 };
     
-
-    //update html and load game data here. "if" no game is found do an alert.
     
 });
+
+
 
 //function rules to be ran in the game so it isn't typed twice
 
@@ -134,46 +139,30 @@ function rules(a,b){
 
 };
 
-
-
-
-//function for the game itself
-/*function game(){
-
-  
-    if(player == 1){
-        if(playerTwoChoice == null){
-            //notify player one is ready
-        }else{
-            rules(playerOneChoice,playerTwoChoice);
-        }
-    };
-
-    if(player == 2){
-        if(playerOneChoice == null){
-            //notify player two is ready
-        }else{
-            rules();
-        }
-    }
-};*/
-
 //click event to run game
 
 $("body").on("click",".choice", function(){
-    
-    //var buttonId = $(".rps-btn").attr
+
+   // theGame = database.ref("games").child(gameName);
 
      if(player == 1){
 
-        //I need to get choice from button. Update that as plaayer onechoice
-        var choice = $(this).attr("value");
+       // theGame = database.ref("games").child(gameName);
+        //I need to get choice from button. Update that as player onechoice
+        choice = $(this).attr("value");
+        database.ref("games/"+gameName+"/player1choice").set(choice);
         console.log(choice);
-        //var choiceTwo = database
+        choiceTwo = theGame.player2choice;
+        console.log(choice2);
 
-        //I then need to pull value from firbase and update variable p2choice
-        if(choiceTwo == null){
-            //notify player one is ready
+
+        
+        if(choiceTwo == "none" || undefined){
+            //notify player one is ready through HTML
+            //database.ref("games").child(gameName).playerReady.set("Player 1 Ready!")
+            //$("#player-ready").text() = database.ref("games").child(gameName).playerReady;
+            database.ref("games/"+gameName+"/playerReady").set("Player 1 Ready!");
+    
         }else{
             rules(choice,choice2);
         }
@@ -182,9 +171,12 @@ $("body").on("click",".choice", function(){
     if(player == 2){
         var choice = $(this).attr("value");
         console.log(choice);
+        var choice2 = database.ref().child(joinName).player1choice;
+        console.log(choice2)
+        theGame.set({"player2choice":choice});
 
-        if(playerOneChoice == null){
-            //notify player two is ready
+        if(playerOneChoice == 0){
+        //notify player two is ready
 
 
         }else{
