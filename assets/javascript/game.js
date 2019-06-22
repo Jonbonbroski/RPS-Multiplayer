@@ -5,6 +5,8 @@ $("document").ready(function(){
 var gameName;
 var joinName
 var room;
+var choice;
+var choice2;
 var playerOneName;
 var playerOneChoice;
 var playerOneWins;
@@ -126,61 +128,95 @@ $("body").on("click", "#join-game", function(){
 
 function rules(a,b){
 
+  
     if(a === b){
         //it's a tie
 
         //update html no points added,
-    }else if(a==="rock" && b==="paper" || a==="paper" && b==="scissors" || a==="scissors" && b==="rock" ){
-        //player a loses
-    }else{
-        //player wins
     }
+    if(a==="rock" && b==="paper", a==="paper" && b==="scissors", a==="scissors" && b==="rock"){
+        if(player == 1){
+            //player2wins html
+            playerOneLosses++;
+            database.ref("games/"+gameName+"/player1losses").set(playerOneLosses);
+            playerTwoWins++;
+            database.ref("games/"+gameName+"/player2Wins").set(playerTwoWins);
 
+         }
+         if(player == 2){
+            //player1Wins HTML
+            playerTwoLosses++;
+            database.ref("games/"+joinName+"/player2losses").set(playerTwoLosses);
+            playerOneWins++;
+            database.ref("games/"+joinName+"/player1Wins").set(playerOneWins);
 
+        }
+    }else{
+        if (player == 1){
+            //player1HTML
+            playerTwoLosses++;
+            database.ref("games/"+gameName+"/player2losses").set(playerTwoLosses);
+            playerOneWins++;
+            database.ref("games/"+gameName+"/player1Wins").set(playerOneWins);
+        }
+        if(player == 2){
+            //player2wins html
+            playerOneLosses++;
+            database.ref("games/"+joinName+"/player1losses").set(playerOneLosses);
+            playerTwoWins++;
+            database.ref("games/"+joinName+"/player2Wins").set(playerTwoWins);
+        }
+    }
 };
 
 //click event to run game
 
 $("body").on("click",".choice", function(){
 
-   // theGame = database.ref("games").child(gameName);
+   //theGame = database.ref("games").child(gameName);
+   
 
-     if(player == 1){
+   if(player == 1){
+    choice = $(this).attr("value");
+    console.log(choice);
+    database.ref("games/"+gameName+"/player1choice").set(choice);
+    console.log(choice2)
+    database.ref("games").on("value", function(changedSnapshot){
+        console.log(changedSnapshot.val());
+        choiceTwo = changedSnapshot.val().player2choice;
+    });
 
-       // theGame = database.ref("games").child(gameName);
-        //I need to get choice from button. Update that as player onechoice
-        choice = $(this).attr("value");
-        database.ref("games/"+gameName+"/player1choice").set(choice);
-        console.log(choice);
-        choiceTwo = theGame.player2choice;
-        console.log(choice2);
+    if(choiceTwo === "none" || null || undefined){
 
+        database.ref("games/"+gameName+"/playerReady").set("Player 1 Ready!");
+    //notify player two is ready
 
-        
-        if(choiceTwo == "none" || undefined){
-            //notify player one is ready through HTML
-            //database.ref("games").child(gameName).playerReady.set("Player 1 Ready!")
-            //$("#player-ready").text() = database.ref("games").child(gameName).playerReady;
-            database.ref("games/"+gameName+"/playerReady").set("Player 1 Ready!");
-    
-        }else{
-            rules(choice,choice2);
-        }
-    };
+    }else{
+        rules(choice,choiceTwo);
+        database.ref("games/"+gameName+"/player1choice").set("none");
+        database.ref("games/"+gameName+"/player2choice").set("none");
+    }
+};
 
     if(player == 2){
-        var choice = $(this).attr("value");
+        choice = $(this).attr("value");
         console.log(choice);
-        var choice2 = database.ref().child(joinName).player1choice;
+        database.ref("games/"+joinName+"/player2choice").set(choice);
         console.log(choice2)
-        theGame.set({"player2choice":choice});
+        database.ref("games").on("value", function(changedSnapshot){
+            console.log(changedSnapshot.val());
+            choiceTwo = changedSnapshot.val().player1choice;
+        });
 
-        if(playerOneChoice == 0){
+        if(choiceTwo === "none" || null || undefined){
+
+            database.ref("games/"+joinName+"/playerReady").set("Player 2 Ready!");
         //notify player two is ready
 
-
         }else{
-            rules();
+            rules(choice,choiceTwo);
+            database.ref("games/"+gameName+"/player1choice").set("none");
+            database.ref("games/"+gameName+"/player2choice").set("none");
         }
     }
 
