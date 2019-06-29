@@ -7,7 +7,7 @@ var joinName
 var room;
 var choice;
 var choiceOne;
-var choiceTwo;
+var choiceTwo = 0;
 var playerOneName;
 var playerOneChoice;
 var playerOneWins;
@@ -130,14 +130,15 @@ $("body").on("click", "#join-game", function(){
 //function rules to be ran in the game so it isn't typed twice
 
 function rules(a,b){
-
+    console.log(choice);
+    console.log(choiceTwo);
   
-    if(a === b){
+    if(a == b){
         //it's a tie
 
         //update html no points added,
     }
-    if(a==="rock" && b==="paper", a==="paper" && b==="scissors", a==="scissors" && b==="rock"){
+    if(a==1 && b==2, a==2 && b==3, a==3 && b==1){
         if(player == 1){
             //player2wins html
             playerOneLosses++;
@@ -189,16 +190,16 @@ function playerOneGame(){
         
         function run1(){
             //console.log(otherChoice)
-            if(choiceTwo != "scissors" || "rock" || "paper"){
-                
+            if(choiceTwo == 0){
+                console.log(choiceTwo);
                 database.ref("games/"+gameName+"/playerReady").set("Player 1 Ready!");
                 //notify player two is ready
                 
             }else{
                 console.log(choiceTwo)
                 rules(choice,choiceTwo);
-                database.ref("games/"+gameName+"/player1choice").set("none");
-                database.ref("games/"+gameName+"/player2choice").set("none");
+                database.ref("games/"+gameName+"/player1choice").set(0);
+                database.ref("games/"+gameName+"/player2choice").set(0);
             }
         }
         checker1();
@@ -237,16 +238,16 @@ $("body").on("click",".choice", function(){
         
         function run2(){
             console.log(choiceTwo)
-            if(choiceTwo != "scissors" || "rock" || "paper"){
-                
+            if(choiceTwo == "none"){
+                console.log(choiceTwo);
                 database.ref("games/"+joinName+"/playerReady").set("Player 2 Ready!");
                 //notify player two is ready
                 
             }else{
                 console.log(choiceTwo)
                 rules(choice,choiceTwo);
-                database.ref("games/"+joinName+"/player1choice").set("none");
-                database.ref("games/"+joinName+"/player2choice").set("none");
+                database.ref("games/"+joinName+"/player1choice").set(0);
+                database.ref("games/"+joinName+"/player2choice").set(0);
             }
         }
         checker2();
