@@ -6,7 +6,8 @@ var gameName;
 var joinName
 var room;
 var choice;
-var choice2;
+var choiceOne;
+var choiceTwo;
 var playerOneName;
 var playerOneChoice;
 var playerOneWins;
@@ -40,11 +41,8 @@ database.ref().set({
     games:{}
 });
 
-$("#rps-btn").hide();
-
-database.ref().on("child_added", function(snapshot){
-    console.log(snapshot.val())
-});
+$("#rps-btn-one").hide();
+$("#rps-btn-two").hide();
 
 
 //function to create information to firebase.
@@ -65,9 +63,10 @@ function makeGame(){
      });
 };
 
-database.ref("games").on("value", function(changedSnapshot){
-    console.log(changedSnapshot.val());
-})
+database.ref("games").on("value", function(chatSnapshot){
+   // console.log(chatSnapshot.val());
+});
+
 
 //function to set var values and make player one.
 
@@ -86,6 +85,9 @@ function createGame(){
 
 };
 
+database.ref("games").on("value", function(updateSnap){
+   
+});
 
 
 //function to make game 
@@ -94,7 +96,8 @@ $("body").on("click", "#create-game", function(){
     makeGame();
     player=1;
     console.log(player);
-    $("#rps-btn").show();
+    $("#rps-btn-one").show();
+    $("#rps-btn-two").hide();
     $("#main-display").hide();
 
     //update html and load game data here
@@ -113,7 +116,7 @@ $("body").on("click", "#join-game", function(){
         alert("Game does not exist.");
     }else{
 
-    $("#rps-btn").show();
+    $("#rps-btn-two").show();
     $("#main-display").hide();
 
     
@@ -169,59 +172,104 @@ function rules(a,b){
     }
 };
 
+
+function playerOneGame(){
+    if(player == 1){
+        function checker1(){
+            //choice = $(this).attr("value");
+            console.log(choice);
+            database.ref("games/"+gameName+"/player1choice").set(choice);
+            //console.log(otherChoice)
+            /*database.ref("games/"+gameName).on("child_changed", function(changedSnapshot){
+                //console.log(changedSnapshot.val());
+                otherChoice = changedSnapshot.val().player2choice;
+                return(choiceTwo);
+            });*/
+        };
+        
+        function run1(){
+            //console.log(otherChoice)
+            if(choiceTwo != "scissors" || "rock" || "paper"){
+                
+                database.ref("games/"+gameName+"/playerReady").set("Player 1 Ready!");
+                //notify player two is ready
+                
+            }else{
+                console.log(choiceTwo)
+                rules(choice,choiceTwo);
+                database.ref("games/"+gameName+"/player1choice").set("none");
+                database.ref("games/"+gameName+"/player2choice").set("none");
+            }
+        }
+        checker1();
+        run1();
+    };
+};
+
+
 //click event to run game
 
 $("body").on("click",".choice", function(){
 
-   //theGame = database.ref("games").child(gameName);
-   
-
-   if(player == 1){
+    
     choice = $(this).attr("value");
     console.log(choice);
-    database.ref("games/"+gameName+"/player1choice").set(choice);
-    console.log(choice2)
-    database.ref("games").on("value", function(changedSnapshot){
-        console.log(changedSnapshot.val());
-        choiceTwo = changedSnapshot.val().player2choice;
-    });
+    database.ref("games/"+gameName).on("value", function(updateSnap){
+    choiceTwo = updateSnap.val().player2choice;
+    
+})
 
-    if(choiceTwo === "none" || null || undefined){
+   
+    playerOneGame();
 
-        database.ref("games/"+gameName+"/playerReady").set("Player 1 Ready!");
-    //notify player two is ready
+});
 
-    }else{
-        rules(choice,choiceTwo);
-        database.ref("games/"+gameName+"/player1choice").set("none");
-        database.ref("games/"+gameName+"/player2choice").set("none");
-    }
+
+    
+    function playerTwoGame(){
+    if(player == 2){
+        function checker2(){
+            //choice = $(this).attr("value");
+
+            database.ref("games/"+joinName+"/player2choice").set(choice);
+
+        };
+        
+        function run2(){
+            console.log(choiceTwo)
+            if(choiceTwo != "scissors" || "rock" || "paper"){
+                
+                database.ref("games/"+joinName+"/playerReady").set("Player 2 Ready!");
+                //notify player two is ready
+                
+            }else{
+                console.log(choiceTwo)
+                rules(choice,choiceTwo);
+                database.ref("games/"+joinName+"/player1choice").set("none");
+                database.ref("games/"+joinName+"/player2choice").set("none");
+            }
+        }
+        checker2();
+        run2();
+    };
 };
 
-    if(player == 2){
-        choice = $(this).attr("value");
-        console.log(choice);
-        database.ref("games/"+joinName+"/player2choice").set(choice);
-        console.log(choice2)
-        database.ref("games").on("value", function(changedSnapshot){
-            console.log(changedSnapshot.val());
-            choiceTwo = changedSnapshot.val().player1choice;
-        });
+$("body").on("click",".choice2", function(){
+   
 
-        if(choiceTwo === "none" || null || undefined){
+    choice = $(this).attr("value");
+    console.log(choice);
+    database.ref("games/"+joinName).on("value", function(updateTwoSnap){
+        choiceTwo = updateTwoSnap.val().player1choice;
+        
+    })
 
-            database.ref("games/"+joinName+"/playerReady").set("Player 2 Ready!");
-        //notify player two is ready
+  
+    playerTwoGame();
+    });
 
-        }else{
-            rules(choice,choiceTwo);
-            database.ref("games/"+gameName+"/player1choice").set("none");
-            database.ref("games/"+gameName+"/player2choice").set("none");
-        }
-    }
-
-})
 });
+
 
 
 
