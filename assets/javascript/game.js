@@ -10,12 +10,12 @@ var choiceOne;
 var choiceTwo = 0;
 var playerOneName;
 var playerOneChoice;
-var playerOneWins;
-var playerOneLosses;
+var playerOneWins=0;
+var playerOneLosses=0;
 var playerOneChat;
 var playerTwoChoice;
-var playerTwoWins;
-var playerTwoLosses;
+var playerTwoWins=0;
+var playerTwoLosses=0;
 var playerTwoChat; 
 var player = 0;
 
@@ -45,7 +45,7 @@ $("#rps-btn-one").hide();
 $("#rps-btn-two").hide();
 
 
-//function to create information to firebase.
+//function to create new game information to firebase.
 function makeGame(){
     firebase.database().ref().child('games').set({
         [gameName]:{
@@ -90,7 +90,7 @@ database.ref("games").on("value", function(updateSnap){
 });
 
 
-//function to make game 
+//Even to make new game and update HTML to game view. 
 $("body").on("click", "#create-game", function(){
     createGame();
     makeGame();
@@ -100,12 +100,10 @@ $("body").on("click", "#create-game", function(){
     $("#rps-btn-two").hide();
     $("#main-display").hide();
 
-    //update html and load game data here
-
 });
 
 
-//function to join game
+//Function to join game that has already been created. This also defines player 2
 $("body").on("click", "#join-game", function(){
     playerTwoName = prompt("Please enter your gamer name:", "Dumpster Juice");
     joinName = prompt("Please enter game name:", "Sock'em Boppers");
@@ -128,10 +126,11 @@ $("body").on("click", "#join-game", function(){
 
 
 //function rules to be ran in the game so it isn't typed twice
+//this compares the player choices.
 
 function rules(a,b){
-    console.log(choice);
-    console.log(choiceTwo);
+    console.log(a);
+    console.log(b);
   
     if(a == b){
         //it's a tie
@@ -144,7 +143,7 @@ function rules(a,b){
             playerOneLosses++;
             database.ref("games/"+gameName+"/player1losses").set(playerOneLosses);
             playerTwoWins++;
-            database.ref("games/"+gameName+"/player2Wins").set(playerTwoWins);
+            database.ref("games/"+gameName+"/player2wins").set(playerTwoWins);
 
          }
          if(player == 2){
@@ -152,27 +151,30 @@ function rules(a,b){
             playerTwoLosses++;
             database.ref("games/"+joinName+"/player2losses").set(playerTwoLosses);
             playerOneWins++;
-            database.ref("games/"+joinName+"/player1Wins").set(playerOneWins);
+            database.ref("games/"+joinName+"/player1wins").set(playerOneWins);
 
         }
     }else{
         if (player == 1){
             //player1HTML
             playerTwoLosses++;
-            database.ref("games/"+gameName+"/player2losses").set(playerTwoLosses);
+            database.ref("games/"+gameName+"/player2losses").set().val(playerTwoLosses);
             playerOneWins++;
-            database.ref("games/"+gameName+"/player1Wins").set(playerOneWins);
+            database.ref("games/"+gameName+"/player1wins").set(playerOneWins);
         }
         if(player == 2){
             //player2wins html
             playerOneLosses++;
             database.ref("games/"+joinName+"/player1losses").set(playerOneLosses);
             playerTwoWins++;
-            database.ref("games/"+joinName+"/player2Wins").set(playerTwoWins);
+            database.ref("games/"+joinName+"/player2wins").set(playerTwoWins);
         }
     }
 };
 
+
+//This function runs the game for player one. If player chooses first, it will display
+//player is ready. If player clicks second, it will run the game and update score. 
 
 function playerOneGame(){
     if(player == 1){
@@ -180,12 +182,7 @@ function playerOneGame(){
             //choice = $(this).attr("value");
             console.log(choice);
             database.ref("games/"+gameName+"/player1choice").set(choice);
-            //console.log(otherChoice)
-            /*database.ref("games/"+gameName).on("child_changed", function(changedSnapshot){
-                //console.log(changedSnapshot.val());
-                otherChoice = changedSnapshot.val().player2choice;
-                return(choiceTwo);
-            });*/
+   
         };
         
         function run1(){
@@ -208,15 +205,29 @@ function playerOneGame(){
 };
 
 
-//click event to run game
+//Click event to set player 1 and check player 2 selection.
 
 $("body").on("click",".choice", function(){
 
-    
-    choice = $(this).attr("value");
+    if( $(this).attr("value")=="1"){
+        choice = 1
+    }
+    if( $(this).attr("value")=="2"){
+        choice = 2
+    }else{
+        choice = 3
+    };
+
     console.log(choice);
     database.ref("games/"+gameName).on("value", function(updateSnap){
-    choiceTwo = updateSnap.val().player2choice;
+    var pick = updateSnap.val().player2choice;
+    if(pick == "1"){
+        choiceTwo = 1
+    }if(pick == "2"){
+        choiceTwo = 2
+    }else{
+        choiceTwo = 3
+    };
     
 })
 
@@ -225,7 +236,8 @@ $("body").on("click",".choice", function(){
 
 });
 
-
+//Similar function but for player two. If player two makes a choice first, it displays
+//player 2 ready, otherwise it runs game and updates score. 
     
     function playerTwoGame(){
     if(player == 2){
@@ -257,11 +269,25 @@ $("body").on("click",".choice", function(){
 
 $("body").on("click",".choice2", function(){
    
+    if( $(this).attr("value")=="1"){
+        choice = 1
+    }
+    if( $(this).attr("value")=="2"){
+        choice = 2
+    }else{
+        choice = 3
+    };
 
-    choice = $(this).attr("value");
     console.log(choice);
     database.ref("games/"+joinName).on("value", function(updateTwoSnap){
-        choiceTwo = updateTwoSnap.val().player1choice;
+        var pick = updateTwoSnap.val().player1choice;
+        if(pick == "1"){
+            choiceTwo = 1
+        }if(pick== "2"){
+            choiceTwo =2
+        }else{
+            choiceTwo = 3
+        };
         
     })
 
