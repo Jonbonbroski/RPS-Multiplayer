@@ -13,6 +13,7 @@ var playerOneChoice;
 var playerOneWins=0;
 var playerOneLosses=0;
 var playerOneChat;
+var playerTwoName="";
 var playerTwoChoice;
 var playerTwoWins=0;
 var playerTwoLosses=0;
@@ -54,6 +55,7 @@ function makeGame(){
             player1wins: playerOneWins,
             player1losses:playerOneLosses,
             player1chat:playerOneChat,
+            player2name:playerTwoName,
             player2choice:playerTwoChoice,
             player2wins:playerOneWins,
             player2losses:playerOneLosses,
@@ -116,6 +118,7 @@ $("body").on("click", "#join-game", function(){
 
     $("#rps-btn-two").show();
     $("#main-display").hide();
+    database.ref("games/"+joinName+"/player2name").set(playerTwoName);
 
     
 };
